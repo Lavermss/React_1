@@ -1,13 +1,10 @@
-import Gallery from "./components/Gallery";
-import NamedComponentTest from "./components/NamedComponentTest";
-import Profile from "./components/Profile";
+import ParentComp from "./components/PaerentComp";
 
 
 export default function App(){
   return(
     <>
-    <NamedComponentTest/>
-    <Gallery/>
+      <ParentComp alt="React" width={100} height={100}/>
     </>
   )
 }

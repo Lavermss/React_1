@@ -1,10 +1,9 @@
-import reactLogo from '../assets/react.svg'
-import App from '../App'
+import reactLogo from "../assets/react.svg";
 
-export default function Profile(){
-    return(
-        <>
-            {/* <img className="button-icon" src={reactLogo} alt=""/> */}
-        </>
-    )
+export default function Profile() {
+  return (
+    <>
+      <img className="button-icon" src={reactLogo} style={{ width: 150 }} />
+    </>
+  );
 }

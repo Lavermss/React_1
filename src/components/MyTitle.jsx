@@ -1,7 +1,7 @@
 export default function MyTitle() {
-    return(
-        <>
-            {/* <h1>My Gallery</h1> */}
-        </>
-    )
+  return (
+    <>
+      <h1>My Gallery</h1>
+    </>
+  );
 }
