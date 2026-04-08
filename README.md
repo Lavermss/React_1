@@ -215,11 +215,3 @@ function HeroList() {
 - key 필수
 
 ---
-
-## 커밋
-
-```bash
-git add README.md
-git commit -m "4~6주차 React 학습 기록"
-git push origin master
-```
