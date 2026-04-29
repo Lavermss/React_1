@@ -1,25 +1,5 @@
 <h1 align="center">202130402 김민수</h1>
 
-<<<<<<< HEAD
----
-
-## 📅 7주차 (4월 15일)
-# 7주차 학습 기록: 리스트 렌더링과 컴포넌트 구조
-
-## 1. 배열 데이터 렌더링
-
-배열 데이터를 활용하여 화면에 리스트를 출력하는 방법을 학습하였다.
-
-- `filter()`로 조건에 맞는 데이터 추출
-- `map()`으로 JSX 변환
-
-```jsx
-const list = heroes
-  .filter(hero => hero.name === "블랙 팬더")
-  .map(hero => <li key={hero.id}>{hero.name}</li>);
-```
-
-=======
 ## 📅 8주차 (4월 30일)
 # 8주차 학습 기록: CSS 적용 방법 및 이벤트 처리
 
@@ -181,7 +161,6 @@ const list = heroes
   .map(hero => <li key={hero.id}>{hero.name}</li>);
 ```
 
->>>>>>> 2166d3a (학습기록정리)
 ---
 
 ## 2. 화살표 함수 사용
