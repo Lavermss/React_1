@@ -1,5 +1,6 @@
 <h1 align="center">202130402 김민수</h1>
 
+<<<<<<< HEAD
 ---
 
 ## 📅 7주차 (4월 15일)
@@ -18,6 +19,169 @@ const list = heroes
   .map(hero => <li key={hero.id}>{hero.name}</li>);
 ```
 
+=======
+## 📅 8주차 (4월 30일)
+# 8주차 학습 기록: CSS 적용 방법 및 이벤트 처리
+
+---
+
+## 1. 일반 CSS 적용
+
+가장 기본적인 방식으로 CSS 파일을 생성한 후 컴포넌트에서 import하여 사용하는 방법을 학습하였다.
+
+- HTML과 동일하게 CSS 적용
+- JSX에서는 `class` 대신 `className` 사용
+- 전역 스타일이므로 충돌 가능성 존재
+
+```css
+/* styles.css */
+.button {
+  background: blue;
+  color: white;
+}
+```
+
+```jsx
+import './styles.css';
+
+function Button() {
+  return <button className="button">Click</button>;
+}
+```
+
+---
+
+## 2. 인라인 스타일
+
+JSX 내부에서 직접 스타일을 적용하는 방법을 학습하였다.
+
+- 객체 형태로 스타일 작성
+- 속성은 camelCase 사용
+- 유지보수 어려움으로 제한적으로 사용
+
+```jsx
+function Button() {
+  return (
+    <button style={{ backgroundColor: 'blue', color: 'white' }}>
+      Click
+    </button>
+  );
+}
+```
+
+---
+
+## 3. 이벤트 핸들러
+
+React에서 이벤트를 처리하는 방법을 학습하였다.
+
+- JSX에서 이벤트 속성 사용 가능 (onClick 등)
+- 이벤트는 함수 형태로 전달해야 함
+
+```jsx
+<button onClick={() => alert('You clicked me!')}>
+  Click
+</button>
+```
+
+### ■ 주의
+```jsx
+// 잘못된 방식 (렌더링 시 바로 실행됨)
+<button onClick={alert('You clicked me!')}>
+```
+
+---
+
+## 4. 이벤트 응답 구조
+
+- 클릭, hover, 입력 등 사용자 동작에 반응
+- JSX에서 직접 이벤트 핸들러 연결
+- 사용자 정의 컴포넌트에서도 이벤트 전달 가능
+
+---
+
+## 5. CSS Module 사용
+
+CSS 충돌 문제를 해결하기 위한 방식으로 CSS Module을 학습하였다.
+
+- 파일명: `컴포넌트명.module.css`
+- import 시 객체 형태로 사용
+- 클래스 충돌 방지 (지역 스코프)
+
+```css
+/* ButtonCom.module.css */
+.navBar {
+  padding: 15px;
+  background-color: #ccc;
+}
+
+.myButton {
+  margin-right: 10px;
+}
+```
+
+```jsx
+import styles from './ButtonCom.module.css';
+
+export default function ButtonCom() {
+  return (
+    <nav className={styles.navBar}>
+      <button className={styles.myButton}>Click</button>
+    </nav>
+  );
+}
+```
+
+---
+
+## 6. 여러 클래스 적용 및 조건부 스타일
+
+```jsx
+<nav className={`${styles.navBar} ${styles.active}`}></nav>
+```
+
+```jsx
+<nav className={`${styles.navBar} ${isActive ? styles.active : ''}`}></nav>
+```
+
+---
+
+## 핵심 정리
+
+- CSS 적용 방식: 일반 CSS / 인라인 / CSS Module
+- JSX에서는 className 사용
+- 인라인 스타일은 객체 형태로 작성
+- 이벤트는 함수 형태로 전달해야 함
+- CSS Module을 통해 스타일 충돌 방지 가능
+
+---
+
+## 한줄 정리
+
+React에서 스타일 적용 방법과 이벤트 처리 방식, 그리고 CSS Module을 활용한 구조적인 스타일 관리 방법을 학습하였다.
+
+
+
+
+---
+
+## 📅 7주차 (4월 15일)
+# 7주차 학습 기록: 리스트 렌더링과 컴포넌트 구조
+
+## 1. 배열 데이터 렌더링
+
+배열 데이터를 활용하여 화면에 리스트를 출력하는 방법을 학습하였다.
+
+- `filter()`로 조건에 맞는 데이터 추출
+- `map()`으로 JSX 변환
+
+```jsx
+const list = heroes
+  .filter(hero => hero.name === "블랙 팬더")
+  .map(hero => <li key={hero.id}>{hero.name}</li>);
+```
+
+>>>>>>> 2166d3a (학습기록정리)
 ---
 
 ## 2. 화살표 함수 사용
