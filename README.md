@@ -1,4 +1,104 @@
 <h1 align="center">202130402 김민수</h1>
+---
+
+## 📅 9주차 (5월 7일)
+# 9주차 학습 기록: children props와 이벤트 핸들러 전달
+
+---
+
+## 1. children props 이해
+
+컴포넌트 태그 사이의 내용을 `children` props로 전달받는 방법을 학습하였다.
+
+- `<Button>내용</Button>` 형태 사용
+- 태그 사이 내용이 자동으로 children에 전달됨
+
+```jsx
+export default function Button({ message, children }) {
+
+  function handleClick() {
+    alert(message);
+  }
+
+  return (
+    <button onClick={handleClick}>
+      {children}
+    </button>
+  );
+}
+```
+
+---
+
+## 2. children props 특징
+
+children props는 컴포넌트 내부에 직접 정의하지 않아도 자동으로 전달된다.
+
+```jsx
+<Button message="저장 완료">
+  버튼 클릭
+</Button>
+```
+
+- 태그 사이 문자열 또는 JSX 전달 가능
+- 재사용성이 높아짐
+
+---
+
+## 3. 이벤트 핸들러 전달
+
+이벤트 핸들러를 props 형태로 전달하는 구조를 학습하였다.
+
+- 버튼마다 다른 기능 수행 가능
+- 컴포넌트 재사용에 유리
+
+```jsx
+<button onClick={() => alert('clicked')}>
+  Click
+</button>
+```
+
+---
+
+## 4. 이벤트 처리 구조
+
+- Button 컴포넌트 → 출력 담당
+- 이벤트 함수 → 별도 관리
+- 부모 컴포넌트에서 이벤트 전달 가능
+
+---
+
+## 5. 이벤트 핸들러 사용 시 주의점
+
+이벤트 함수를 직접 호출하면 렌더링 시 즉시 실행된다.
+
+```jsx
+// 잘못된 방식
+<button onClick={alert('click')}>
+```
+
+```jsx
+// 올바른 방식
+<button onClick={() => alert('click')}>
+```
+
+---
+
+## 핵심 정리
+
+- children props는 태그 사이 내용을 전달한다
+- 이벤트 핸들러는 함수 형태로 전달해야 한다
+- props 기반 이벤트 전달 구조가 중요하다
+- 컴포넌트 역할 분리가 유지보수에 유리하다
+
+---
+
+## 한줄 정리
+
+children props와 이벤트 핸들러 전달 방식을 활용하여 재사용 가능한 컴포넌트 구조를 학습하였다.
+
+---
+---
 
 ## 📅 8주차 (4월 30일)
 # 8주차 학습 기록: CSS 적용 방법 및 이벤트 처리
@@ -65,6 +165,7 @@ React에서 이벤트를 처리하는 방법을 학습하였다.
 ```
 
 ### ■ 주의
+
 ```jsx
 // 잘못된 방식 (렌더링 시 바로 실행됨)
 <button onClick={alert('You clicked me!')}>
@@ -139,9 +240,6 @@ export default function ButtonCom() {
 ## 한줄 정리
 
 React에서 스타일 적용 방법과 이벤트 처리 방식, 그리고 CSS Module을 활용한 구조적인 스타일 관리 방법을 학습하였다.
-
-
-
 
 ---
 
@@ -239,6 +337,7 @@ function Cup({ guest }) {
 컴포넌트는 조건에 따라 다른 항목을 표시해야 하는 경우가 많습니다. React는 if 문, && 및 ? : 연산자와 같은 자바스크립트 문법을 사용하여 조건부로 JSX를 렌더링할 수 있습니다.
 
 ### 학습 내용
+
 - 조건에 따라 다른 JSX를 반환하는 방법
 - JSX 조각을 조건부로 포함하거나 제외하는 방법
 - React 코드에서 흔히 볼 수 있는 조건부 문법
@@ -257,6 +356,7 @@ function Item({ name, isPacked }) {
 if (isPacked) {
   return <li className="item">{name} ✅</li>;
 }
+
 return <li className="item">{name}</li>;
 ```
 
