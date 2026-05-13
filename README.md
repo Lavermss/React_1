@@ -1,192 +1,298 @@
 <h1 align="center">202130402 김민수</h1>
 ---
----
 
-## 📅 10주차 (5월 13일)
-# 10주차 학습 기록: 이벤트 전파와 State 기초
-
----
-
-## 1. children props 활용
-
-컴포넌트 태그 사이의 내용을 `children` props로 전달받아 사용하는 방법을 학습하였다.
-
-- `<Button>내용</Button>` 형태 사용
-- 태그 내부 내용이 자동으로 children에 전달됨
-- 문자열뿐 아니라 JSX도 전달 가능
-
-```jsx
-<Button message="클릭 이벤트">
-  버튼 클릭
-</Button>
-```
+## 📅 10주차
+# 10주차 학습 기록: 이벤트 전파, 기본 동작 방지, State와 이미지 관리
 
 ---
 
-## 2. 이벤트 핸들러 전달
+## 1. 이벤트 전파 이해
 
-이벤트 함수를 props 형태로 전달하여 버튼마다 다른 동작을 수행하도록 구성하였다.
+React에서 이벤트는 자식 요소에서 발생한 뒤 부모 요소로 전달될 수 있다.
 
-- 이벤트 함수도 props로 전달 가능
-- 부모 컴포넌트에서 이벤트 로직 관리 가능
-- 컴포넌트 재사용성 향상
+예를 들어 `<nav>` 안에 `<button>`이 있을 때 버튼을 클릭하면 버튼의 클릭 이벤트가 먼저 실행되고, 이후 부모인 nav의 클릭 이벤트도 함께 실행될 수 있다.
 
-```jsx
-<Button onClick={() => alert("버튼1 클릭!")}>
-  버튼1
-</Button>
-```
-
----
-
-## 3. 이벤트 전파(Event Bubbling)
-
-하위 요소에서 발생한 이벤트가 부모 요소까지 전달되는 구조를 학습하였다.
+이러한 흐름을 이벤트 전파라고 한다.
 
 ```jsx
 <nav onClick={() => alert("네비게이션바 클릭!")}>
+  <button onClick={() => alert("버튼1 클릭!")}>
+    버튼1
+  </button>
+
+  <button onClick={() => alert("버튼2 클릭!")}>
+    버튼2
+  </button>
+</nav>
 ```
 
-- 버튼 클릭 시 부모 이벤트도 함께 실행됨
-- DOM 트리 기반 이벤트 전달 구조 이해
-- React에서도 기본적으로 이벤트 전파 발생
+위 코드에서는 버튼을 클릭했을 때 버튼 이벤트뿐만 아니라 부모 요소인 nav의 이벤트도 함께 실행될 수 있다.
 
 ---
 
-## 4. 이벤트 전파 중지
+## 2. 이벤트 전파의 중지
 
-`stopPropagation()`을 사용하여 이벤트 전파를 중지하는 방법을 학습하였다.
+이벤트가 부모 요소까지 전달되지 않게 하려면 `e.stopPropagation()`을 사용한다.
+
+이벤트 핸들러는 이벤트 객체를 매개변수로 받을 수 있으며, 일반적으로 `event` 또는 `e`라는 이름으로 사용한다.
 
 ```jsx
-<button
-  onClick={(e) => {
-    e.stopPropagation();
-    onClick();
-  }}
->
+function Button({ onClick, children }) {
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+    >
+      {children}
+    </button>
+  );
+}
 ```
 
-- 부모 이벤트 실행 방지 가능
-- 독립적인 이벤트 처리 가능
-- 이벤트 객체(event)를 활용하여 제어
+`e.stopPropagation()`을 사용하면 버튼 클릭 이벤트가 부모 요소인 nav까지 전달되지 않는다.
 
 ---
 
-## 5. preventDefault()
+## 3. 이벤트 핸들러를 props로 전달
 
-브라우저의 기본 동작을 방지하는 방법을 학습하였다.
+부모 컴포넌트에서 이벤트 함수를 만들고, 자식 컴포넌트에 props로 전달할 수 있다.
 
 ```jsx
-e.preventDefault();
+function Button({ onClick, children }) {
+  return (
+    <button onClick={onClick}>
+      {children}
+    </button>
+  );
+}
 ```
 
-- form 제출 시 새로고침 방지
-- 사용자 정의 이벤트 처리 가능
-- 브라우저 기본 기능 제어 가능
+```jsx
+export default function Bubble() {
+  return (
+    <>
+      <h1>Bubble</h1>
+
+      <nav onClick={() => alert("네비게이션바 클릭!")}>
+        <Button onClick={() => alert("버튼1 클릭!")}>
+          버튼1
+        </Button>
+
+        <Button onClick={() => alert("버튼2 클릭!")}>
+          버튼2
+        </Button>
+      </nav>
+    </>
+  );
+}
+```
+
+이 구조를 사용하면 Button 컴포넌트는 화면 출력 역할을 담당하고, 실제 실행할 이벤트 함수는 부모 컴포넌트에서 관리할 수 있다.
 
 ---
 
-## 6. CSS Module 활용
+## 4. CSS Module 적용
 
-CSS Module을 사용하여 컴포넌트 단위로 스타일을 관리하는 방법을 학습하였다.
+CSS Module을 사용하면 컴포넌트별로 스타일을 분리하여 관리할 수 있다.
 
-- 스타일 충돌 방지 가능
-- 지역 스코프(local scope) 기반 적용
-- 유지보수 효율 증가
+파일명은 보통 `컴포넌트명.module.css` 형태로 작성한다.
+
+```css
+/* Bubble.module.css */
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.navBar {
+  display: flex;
+  padding: 10px;
+  background-color: #666;
+}
+
+.button {
+  padding: 10px 20px;
+  margin: 5px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+```
 
 ```jsx
 import style from "./Bubble.module.css";
 
-<h1 className={style.title}>Bubble</h1>
-```
+export default function Bubble() {
+  return (
+    <>
+      <h1 className={style.title}>Bubble</h1>
 
----
+      <nav className={style.navBar} onClick={() => alert("네비게이션바 클릭!")}>
+        <button className={style.button} onClick={() => alert("버튼1 클릭!")}>
+          버튼1
+        </button>
 
-## 7. CSS Module 네이밍 규칙
-
-- 파일명은 `.module.css` 사용
-- React에서는 camelCase 방식 권장
-- class 선택자 기반 스타일 작성
-
-```css
-.navBar {
-  padding: 10px;
+        <button className={style.button} onClick={() => alert("버튼2 클릭!")}>
+          버튼2
+        </button>
+      </nav>
+    </>
+  );
 }
 ```
 
 ---
 
-## 8. video 태그와 DOM 접근
+## 5. 브라우저 기본 동작 방지
 
-JSX에서 `<video />` 태그를 사용하는 방법을 학습하였다.
+브라우저 이벤트 중에는 기본 동작을 가지고 있는 이벤트가 있다.
+
+예를 들어 form을 제출하는 `onSubmit` 이벤트는 기본적으로 페이지를 새로고침한다.
+
+이 기본 동작을 막기 위해 `e.preventDefault()`를 사용한다.
 
 ```jsx
-<video src="movie.mp4" />
+export default function Signup1() {
+  function handleSubmit(e) {
+    e.preventDefault();
+    alert("제출되었습니다.");
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input placeholder="이름을 입력하세요" />
+      <button type="submit">제출</button>
+    </form>
+  );
+}
 ```
 
-- JSX에서는 self-closing 태그 사용 가능
-- React에서는 DOM 직접 접근을 권장하지 않음
-- 이후 useRef Hook 기반 관리 예정
+`e.preventDefault()`는 브라우저가 가진 기본 동작을 막을 때 사용한다.
 
 ---
 
-## 9. State 개념 이해
+## 6. stopPropagation과 preventDefault 차이
 
-React에서 state는 컴포넌트가 기억해야 하는 데이터라는 점을 학습하였다.
+`e.stopPropagation()`과 `e.preventDefault()`는 비슷해 보이지만 서로 다른 기능을 가진다.
 
-예시:
-- 입력값 저장
-- 이미지 변경
-- 장바구니 데이터 관리
+| 구분 | 기능 |
+|------|------|
+| `e.stopPropagation()` | 이벤트가 부모 요소로 전달되는 것을 막음 |
+| `e.preventDefault()` | 브라우저의 기본 동작을 막음 |
 
-- 사용자 상호작용 결과를 저장하는 역할
-- 화면 업데이트와 연결됨
+```jsx
+e.stopPropagation();
+```
+
+```jsx
+e.preventDefault();
+```
+
+이벤트 전파를 막을 때는 `stopPropagation`, form 제출이나 링크 이동 같은 기본 동작을 막을 때는 `preventDefault`를 사용한다.
 
 ---
 
-## 10. 로컬 변수 기반 상태 저장
+## 7. State 개념
 
-로컬 변수로 index 값을 저장하여 캐러셀 구조를 구현하였다.
+State는 컴포넌트가 기억해야 하는 값이다.
+
+React 컴포넌트는 사용자의 동작에 따라 화면 내용이 바뀌어야 하는 경우가 많다.
+
+예를 들어 이미지 캐러셀에서 다음 버튼을 누르면 현재 보여주는 이미지가 변경되어야 한다.
+
+이처럼 컴포넌트가 현재 상태를 기억하고 화면을 다시 렌더링하기 위해 사용하는 값이 State이다.
+
+---
+
+## 8. 로컬 변수에 컴포넌트 상태 저장
+
+가장 단순한 방식으로 로컬 변수를 사용하여 현재 이미지의 index 값을 저장할 수 있다.
 
 ```jsx
 let index = 0;
+
+function handleNextClick() {
+  index = index + 1;
+}
 ```
 
-- 버튼 클릭 시 index 값 변경
-- 슬라이드 형태 UI 구성 가능
-- 상태 저장 구조의 필요성 이해
+하지만 일반 로컬 변수는 값이 바뀌어도 React가 화면을 다시 렌더링하지 않는다.
+
+따라서 실제 React에서는 `useState` Hook을 사용하여 상태를 관리하는 것이 적절하다.
 
 ---
 
-## 11. 이미지 관리 구조
+## 9. 이미지 모듈 관리
 
-여러 이미지를 사용할 때 import 코드가 복잡해지는 문제를 해결하기 위한 구조를 학습하였다.
+로컬 이미지를 사용할 때는 이미지를 직접 import해서 사용할 수 있다.
 
 ```jsx
-import image1 from "./images/image1.jpg";
-import image2 from "./images/image2.jpg";
+import slider1 from "./locallmg1.jpg";
+import slider2 from "./locallmg2.jpg";
+
+export const slide = { slider1, slider2 };
 ```
 
-- 이미지 모듈화 가능
-- import 코드 정리 가능
-- assets 디렉토리 구조 관리 중요
+이미지가 많아지면 컴포넌트 안에서 이미지를 하나씩 import하는 코드가 길어질 수 있다.
+
+이때 이미지 폴더 안에 `index.jsx` 파일을 만들어 이미지를 한 곳에서 관리하면 코드가 깔끔해진다.
+
+```jsx
+import slider1 from "./locallmg1.jpg";
+import slider2 from "./locallmg2.jpg";
+
+export const slide = {
+  slider1,
+  slider2,
+};
+```
+
+이렇게 작성해두면 다른 컴포넌트에서 이미지 모듈을 불러와 사용할 수 있다.
+
+---
+
+## 10. 캐러셀 구현 방향
+
+이미지 캐러셀은 현재 보여줄 이미지의 index 값을 저장하고, 버튼 클릭 시 index 값을 변경하는 방식으로 만들 수 있다.
+
+```jsx
+const images = [
+  slide.slider1,
+  slide.slider2,
+];
+
+let index = 0;
+```
+
+```jsx
+function handleNextClick() {
+  index = index + 1;
+}
+```
+
+다만 로컬 변수만 사용할 경우 화면이 자동으로 갱신되지 않기 때문에, 이후에는 `useState`를 사용하여 현재 index 값을 관리해야 한다.
 
 ---
 
 ## 핵심 정리
 
-- children props로 태그 내부 내용 전달 가능
-- 이벤트 함수도 props 형태로 전달 가능
-- stopPropagation()으로 이벤트 전파 중지 가능
-- preventDefault()로 브라우저 기본 동작 방지 가능
-- CSS Module을 활용하여 스타일 충돌 방지 가능
-- state는 컴포넌트가 기억해야 하는 값이다
+- 이벤트는 자식 요소에서 부모 요소로 전파될 수 있다
+- `e.stopPropagation()`은 이벤트 전파를 중지한다
+- `e.preventDefault()`는 브라우저 기본 동작을 막는다
+- 이벤트 핸들러는 props로 전달할 수 있다
+- CSS Module을 사용하면 컴포넌트별 스타일 관리가 가능하다
+- State는 컴포넌트가 기억해야 하는 값이다
+- 이미지가 많을 경우 index 파일로 모듈화하면 관리가 편하다
+- 캐러셀은 현재 이미지 index 값을 기준으로 화면을 변경하는 구조이다
 
 ---
 
 ## 한줄 정리
 
-이벤트 전파 구조와 CSS Module 활용 방식, 그리고 React의 State 개념 및 이벤트 제어 방식을 학습하였다.
+10주차에는 이벤트 전파와 기본 동작 방지, CSS Module 적용, State 개념과 이미지 모듈 관리를 활용하여 재사용 가능한 컴포넌트 구조와 캐러셀 구현의 기초를 학습하였다.
 
 ---
 
