@@ -1,7 +1,196 @@
 <h1 align="center">202130402 김민수</h1>
 ---
+---
 
-## 📅 9주차 (5월 7일)
+## 📅 10주차 (5월 14일)
+# 10주차 학습 기록: 이벤트 전파와 State 기초
+
+---
+
+## 1. children props 활용
+
+컴포넌트 태그 사이의 내용을 `children` props로 전달받아 사용하는 방법을 학습하였다.
+
+- `<Button>내용</Button>` 형태 사용
+- 태그 내부 내용이 자동으로 children에 전달됨
+- 문자열뿐 아니라 JSX도 전달 가능
+
+```jsx
+<Button message="클릭 이벤트">
+  버튼 클릭
+</Button>
+```
+
+---
+
+## 2. 이벤트 핸들러 전달
+
+이벤트 함수를 props 형태로 전달하여 버튼마다 다른 동작을 수행하도록 구성하였다.
+
+- 이벤트 함수도 props로 전달 가능
+- 부모 컴포넌트에서 이벤트 로직 관리 가능
+- 컴포넌트 재사용성 향상
+
+```jsx
+<Button onClick={() => alert("버튼1 클릭!")}>
+  버튼1
+</Button>
+```
+
+---
+
+## 3. 이벤트 전파(Event Bubbling)
+
+하위 요소에서 발생한 이벤트가 부모 요소까지 전달되는 구조를 학습하였다.
+
+```jsx
+<nav onClick={() => alert("네비게이션바 클릭!")}>
+```
+
+- 버튼 클릭 시 부모 이벤트도 함께 실행됨
+- DOM 트리 기반 이벤트 전달 구조 이해
+- React에서도 기본적으로 이벤트 전파 발생
+
+---
+
+## 4. 이벤트 전파 중지
+
+`stopPropagation()`을 사용하여 이벤트 전파를 중지하는 방법을 학습하였다.
+
+```jsx
+<button
+  onClick={(e) => {
+    e.stopPropagation();
+    onClick();
+  }}
+>
+```
+
+- 부모 이벤트 실행 방지 가능
+- 독립적인 이벤트 처리 가능
+- 이벤트 객체(event)를 활용하여 제어
+
+---
+
+## 5. preventDefault()
+
+브라우저의 기본 동작을 방지하는 방법을 학습하였다.
+
+```jsx
+e.preventDefault();
+```
+
+- form 제출 시 새로고침 방지
+- 사용자 정의 이벤트 처리 가능
+- 브라우저 기본 기능 제어 가능
+
+---
+
+## 6. CSS Module 활용
+
+CSS Module을 사용하여 컴포넌트 단위로 스타일을 관리하는 방법을 학습하였다.
+
+- 스타일 충돌 방지 가능
+- 지역 스코프(local scope) 기반 적용
+- 유지보수 효율 증가
+
+```jsx
+import style from "./Bubble.module.css";
+
+<h1 className={style.title}>Bubble</h1>
+```
+
+---
+
+## 7. CSS Module 네이밍 규칙
+
+- 파일명은 `.module.css` 사용
+- React에서는 camelCase 방식 권장
+- class 선택자 기반 스타일 작성
+
+```css
+.navBar {
+  padding: 10px;
+}
+```
+
+---
+
+## 8. video 태그와 DOM 접근
+
+JSX에서 `<video />` 태그를 사용하는 방법을 학습하였다.
+
+```jsx
+<video src="movie.mp4" />
+```
+
+- JSX에서는 self-closing 태그 사용 가능
+- React에서는 DOM 직접 접근을 권장하지 않음
+- 이후 useRef Hook 기반 관리 예정
+
+---
+
+## 9. State 개념 이해
+
+React에서 state는 컴포넌트가 기억해야 하는 데이터라는 점을 학습하였다.
+
+예시:
+- 입력값 저장
+- 이미지 변경
+- 장바구니 데이터 관리
+
+- 사용자 상호작용 결과를 저장하는 역할
+- 화면 업데이트와 연결됨
+
+---
+
+## 10. 로컬 변수 기반 상태 저장
+
+로컬 변수로 index 값을 저장하여 캐러셀 구조를 구현하였다.
+
+```jsx
+let index = 0;
+```
+
+- 버튼 클릭 시 index 값 변경
+- 슬라이드 형태 UI 구성 가능
+- 상태 저장 구조의 필요성 이해
+
+---
+
+## 11. 이미지 관리 구조
+
+여러 이미지를 사용할 때 import 코드가 복잡해지는 문제를 해결하기 위한 구조를 학습하였다.
+
+```jsx
+import image1 from "./images/image1.jpg";
+import image2 from "./images/image2.jpg";
+```
+
+- 이미지 모듈화 가능
+- import 코드 정리 가능
+- assets 디렉토리 구조 관리 중요
+
+---
+
+## 핵심 정리
+
+- children props로 태그 내부 내용 전달 가능
+- 이벤트 함수도 props 형태로 전달 가능
+- stopPropagation()으로 이벤트 전파 중지 가능
+- preventDefault()로 브라우저 기본 동작 방지 가능
+- CSS Module을 활용하여 스타일 충돌 방지 가능
+- state는 컴포넌트가 기억해야 하는 값이다
+
+---
+
+## 한줄 정리
+
+이벤트 전파 구조와 CSS Module 활용 방식, 그리고 React의 State 개념 및 이벤트 제어 방식을 학습하였다.
+
+---
+
+## 📅 9주차 (5월 6일)
 # 9주차 학습 기록: children props와 이벤트 핸들러 전달
 
 ---
@@ -100,7 +289,7 @@ children props와 이벤트 핸들러 전달 방식을 활용하여 재사용 �
 ---
 ---
 
-## 📅 8주차 (4월 30일)
+## 📅 8주차 (4월 29일)
 # 8주차 학습 기록: CSS 적용 방법 및 이벤트 처리
 
 ---
