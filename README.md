@@ -1,5 +1,335 @@
 <h1 align="center">202130402 김민수</h1>
 ---
+## 📅 11주차
+# 11주차 학습 기록: State Hook과 이미지 캐러셀 구현
+
+---
+
+## 1. 로컬 변수 방식의 한계
+
+이전 실습에서는 이미지 캐러셀을 만들기 위해 `index` 변수를 선언하고, 버튼 클릭 시 값을 증가시키는 방식으로 구현하였다.
+
+```jsx
+let index = 0; // 현재 이미지 순서 저장
+
+function handleClick() {
+  index = index + 1; // 클릭 시 index 증가
+  console.log(index);
+}
+```
+
+하지만 지역 변수는 컴포넌트의 상태를 저장하는 용도로 사용하기 어렵다.
+
+이벤트 핸들러를 통해 변수 값이 변경되어도 React 컴포넌트는 다시 렌더링되지 않기 때문에 화면에는 변경된 값이 반영되지 않는다.
+
+---
+
+## 2. 이미지 데이터 불러오기
+
+이미지를 캐러셀에서 사용하기 위해 이미지 데이터를 별도 파일에서 import하였다.
+
+```jsx
+import { galleryImages } from "./imgData.jsx"; // 이미지 데이터 import
+```
+
+또는 로컬 이미지 파일을 따로 관리하기 위해 이미지 폴더 안에 `index.jsx` 파일을 만들 수 있다.
+
+```jsx
+import slider1 from "./locallmg1.jpg";
+import slider2 from "./locallmg2.jpg";
+
+export const slide = { // 이미지 모듈화
+  slider1,
+  slider2,
+};
+```
+
+이미지가 많아질수록 컴포넌트 안에서 직접 import하는 방식은 코드가 복잡해지므로, 이미지 관리 파일을 따로 두는 것이 좋다.
+
+---
+
+## 3. 이미지 캐러셀 기본 구조
+
+캐러셀은 현재 보여줄 이미지의 번호를 `index`로 관리하고, 해당 index에 맞는 이미지 정보를 화면에 출력하는 구조이다.
+
+```jsx
+import { galleryImages } from "./imgData.jsx";
+
+export default function Carousel() {
+  let index = 0; // 현재 이미지 index
+
+  function handleClick() {
+    index = index + 1; // 다음 이미지로 이동
+    console.log(index);
+  }
+
+  let slide = galleryImages[index]; // index에 맞는 이미지 선택
+
+  return (
+    <>
+      <button onClick={handleClick}>Next</button>
+
+      <h2>
+        <i>{slide.name}</i>
+        <br />
+        by {slide.artist}
+      </h2>
+
+      <h3>
+        ({index + 1} of {galleryImages.length})
+      </h3>
+
+      <img src={slide.url} alt={slide.alt} />
+
+      <p>{slide.description}</p>
+    </>
+  );
+}
+```
+
+이 코드에서는 버튼을 클릭하면 `index` 값은 증가하지만, 화면이 다시 렌더링되지 않기 때문에 이미지가 바뀌지 않는 문제가 발생한다.
+
+---
+
+## 4. State Hook의 필요성
+
+React에서는 컴포넌트가 기억해야 하는 값을 State로 관리한다.
+
+State는 화면에 표시되는 값이 사용자의 동작에 따라 바뀌어야 할 때 사용한다.
+
+예를 들어 캐러셀에서 다음 버튼을 누르면 다음 이미지가 표시되어야 하므로, 현재 이미지 번호인 `index`는 State로 관리하는 것이 적절하다.
+
+---
+
+## 5. useState 사용 방법
+
+React에서 State를 사용하려면 `useState`를 import해야 한다.
+
+```jsx
+import { useState } from "react"; // useState Hook import
+```
+
+그 다음 기존에 일반 변수로 선언했던 `index`를 State 변수로 변경한다.
+
+```jsx
+const [index, setIndex] = useState(0); // State 변수와 setter 함수 선언
+```
+
+여기서 `index`는 현재 State 값을 의미하고, `setIndex`는 State 값을 변경하는 함수이다.
+
+`useState(0)`은 index의 초기값을 0으로 설정한다는 의미이다.
+
+---
+
+## 6. State Hook의 기본 동작 원리
+
+React에서 `use`로 시작하는 함수를 Hook이라고 한다.
+
+Hook은 React가 렌더링 중일 때만 사용할 수 있는 특별한 함수이다.
+
+`useState`는 React에서 제공하는 Hook 중 하나이며, 컴포넌트가 현재 상태를 기억할 수 있도록 도와준다.
+
+Hook을 사용할 때는 몇 가지 규칙이 있다.
+
+1. Hook은 반드시 import해서 사용한다.
+2. Hook은 컴포넌트의 최상위 수준에서만 호출해야 한다.
+3. 조건문, 반복문, 중첩 함수 내부에서는 Hook을 호출하면 안 된다.
+
+---
+
+## 7. State 값 변경 시 주의점
+
+State 값을 변경할 때는 기존 변수처럼 직접 수정하지 않고 setter 함수를 사용해야 한다.
+
+```jsx
+setIndex(index + 1); // setter 함수로 State 변경
+```
+
+잘못된 방식은 다음과 같다.
+
+```jsx
+index = index + 1; // State 직접 수정은 부적절
+```
+
+State는 setter 함수를 통해 변경해야 React가 값이 바뀐 것을 알고 화면을 다시 렌더링할 수 있다.
+
+---
+
+## 8. console.log 출력 시 주의점
+
+State 값을 변경한 직후 `console.log(index)`를 실행하면 변경 전 값이 출력될 수 있다.
+
+```jsx
+function handleClick() {
+  setIndex(index + 1); // State 변경 요청
+  console.log(index); // 변경 전 값이 출력될 수 있음
+}
+```
+
+이는 State 변경이 즉시 변수에 반영되는 것이 아니라, 다음 렌더링 과정에서 반영되기 때문이다.
+
+따라서 버튼을 클릭했을 때 화면은 다음 렌더링에서 변경된 State 값을 기준으로 갱신된다.
+
+---
+
+## 9. 다음 이미지로 이동하기
+
+Next 버튼을 클릭하면 `index` 값을 1씩 증가시켜 다음 이미지를 보여줄 수 있다.
+
+```jsx
+function handleNext() {
+  setIndex(index + 1); // 다음 이미지 index로 변경
+}
+```
+
+하지만 마지막 이미지에서 계속 증가하면 배열 범위를 벗어날 수 있으므로 조건 처리가 필요하다.
+
+```jsx
+function handleNext() {
+  if (index === galleryImages.length - 1) { // 마지막 이미지인지 확인
+    setIndex(0);
+  } else {
+    setIndex(index + 1);
+  }
+}
+```
+
+위 코드는 마지막 이미지에 도달하면 다시 첫 번째 이미지로 돌아가도록 만든다.
+
+---
+
+## 10. 이전 이미지로 이동하기
+
+Previous 버튼을 클릭하면 `index` 값을 1씩 감소시켜 이전 이미지를 보여줄 수 있다.
+
+```jsx
+function handlePrevious() {
+  setIndex(index - 1); // 이전 이미지 index로 변경
+}
+```
+
+첫 번째 이미지에서 이전 버튼을 누르면 음수 index가 될 수 있으므로 조건 처리가 필요하다.
+
+```jsx
+function handlePrevious() {
+  if (index === 0) { // 첫 번째 이미지인지 확인
+    setIndex(galleryImages.length - 1);
+  } else {
+    setIndex(index - 1);
+  }
+}
+```
+
+위 코드는 첫 번째 이미지에서 Previous 버튼을 누르면 마지막 이미지로 이동하도록 만든다.
+
+---
+
+## 11. 캐러셀 최종 구조
+
+```jsx
+import { useState } from "react"; // State Hook 사용
+import { galleryImages } from "./imgData.jsx"; // 이미지 데이터 사용
+import styles from "./Carousel.module.css";
+
+export default function Carousel() {
+  const [index, setIndex] = useState(0); // 현재 이미지 index를 State로 관리
+
+  function handleNext() {
+    if (index === galleryImages.length - 1) { // 마지막이면 처음으로 이동
+      setIndex(0);
+    } else {
+      setIndex(index + 1);
+    }
+  }
+
+  function handlePrevious() {
+    if (index === 0) { // 처음이면 마지막으로 이동
+      setIndex(galleryImages.length - 1);
+    } else {
+      setIndex(index - 1);
+    }
+  }
+
+  let slide = galleryImages[index]; // 현재 index의 이미지 정보
+
+  return (
+    <section className={styles.wrapper}>
+      <h2>
+        <i>{slide.name}</i>
+        <br />
+        by {slide.artist}
+      </h2>
+
+      <h3>
+        ({index + 1} of {galleryImages.length})
+      </h3>
+
+      <img src={slide.url} alt={slide.alt} />
+
+      <div>
+        <button className={styles.button} onClick={handlePrevious}>
+          Previous
+        </button>
+
+        <button className={styles.button} onClick={handleNext}>
+          Next
+        </button>
+      </div>
+
+      <p>{slide.description}</p>
+    </section>
+  );
+}
+```
+
+---
+
+## 12. CSS Module 적용
+
+캐러셀 컴포넌트에도 CSS Module을 적용하여 스타일을 분리할 수 있다.
+
+```css
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.button {
+  padding: 10px 20px;
+  margin: 5px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+```
+
+CSS Module을 사용하면 클래스명이 다른 컴포넌트와 충돌하지 않고, 컴포넌트 단위로 스타일을 관리할 수 있다.
+
+---
+
+## 핵심 정리
+
+- 지역 변수는 컴포넌트의 상태 저장에 적합하지 않다.
+- 지역 변수 값이 변경되어도 React는 자동으로 다시 렌더링하지 않는다.
+- React에서 상태를 관리할 때는 `useState` Hook을 사용한다.
+- `useState`는 현재 값과 값을 변경하는 setter 함수를 반환한다.
+- State 값을 변경할 때는 직접 수정하지 않고 setter 함수를 사용해야 한다.
+- State 변경 직후의 `console.log`는 이전 값이 출력될 수 있다.
+- 캐러셀은 현재 이미지 index를 State로 관리하여 구현할 수 있다.
+- 마지막 이미지 다음에는 첫 번째 이미지로, 첫 번째 이미지 이전에는 마지막 이미지로 이동하도록 조건 처리가 필요하다.
+- 이미지 파일은 index 파일로 모듈화하면 관리하기 편하다.
+- CSS Module을 사용하면 컴포넌트별 스타일 관리가 가능하다.
+
+---
+
+## 한줄 정리
+
+11주차에는 `useState` Hook을 활용하여 컴포넌트의 상태를 관리하고, 이미지 index 값을 변경해 Previous와 Next 버튼이 있는 이미지 캐러셀을 구현하는 방법을 학습하였다.
+
+---
 
 ## 📅 10주차
 # 10주차 학습 기록: 이벤트 전파, 기본 동작 방지, State와 이미지 관리
