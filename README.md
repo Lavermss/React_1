@@ -1,6 +1,321 @@
 <h1 align="center">202130402 김민수</h1>
 ---
 
+## 📅 12주차
+# 12주차 학습 기록: State Hook의 동작 원리와 렌더링 과정
+
+---
+
+## 1. State Hook 기본 정리
+
+React에서는 `useState`와 같이 `use`로 시작하는 함수를 Hook이라고 한다.
+
+Hook은 React가 렌더링 중일 때 사용할 수 있는 특별한 함수이며, 컴포넌트가 필요한 기능을 React에게 요청하는 역할을 한다.
+
+```jsx
+import { useState } from "react"; // useState Hook 사용
+
+const [index, setIndex] = useState(0); // State 변수와 setter 함수 선언
+```
+
+`useState(0)`은 `index`라는 state의 초기값을 0으로 설정한다는 뜻이다.
+
+여기서 `index`는 현재 state 값이고, `setIndex`는 state 값을 변경할 때 사용하는 함수이다.
+
+---
+
+## 2. Hook 사용 시 주의점
+
+Hook은 일반 함수처럼 보이지만 React 안에서 특별한 규칙을 가진다.
+
+1. Hook은 반드시 import해서 사용한다.
+2. Hook은 컴포넌트의 최상위 수준에서만 호출해야 한다.
+3. 조건문, 반복문, 중첩 함수 내부에서는 Hook을 호출하면 안 된다.
+
+```jsx
+export default function Carousel() {
+  const [index, setIndex] = useState(0); // 컴포넌트 최상위에서 Hook 호출
+
+  return (
+    <div>
+      {index}
+    </div>
+  );
+}
+```
+
+Hook은 컴포넌트가 어떤 기능을 필요로 하는지 React에게 알려주는 선언문처럼 이해할 수 있다.
+
+---
+
+## 3. 여러 개의 State 사용하기
+
+하나의 컴포넌트에서는 여러 개의 state 변수를 사용할 수 있다.
+
+예를 들어 이미지 캐러셀에서는 현재 이미지 번호를 저장하는 `index`와 설명 표시 여부를 저장하는 `more`를 함께 사용할 수 있다.
+
+```jsx
+export default function Carousel() {
+  const [index, setIndex] = useState(0); // 현재 이미지 번호 관리
+  const [more, setMore] = useState(false); // 설명 표시 여부 관리
+
+  return (
+    <div>
+      ...
+    </div>
+  );
+}
+```
+
+서로 관련이 없는 값이라면 state를 따로 나누어 관리하는 것이 좋다.
+
+반대로 여러 값이 항상 함께 변경된다면 하나의 객체 state로 묶는 것이 더 적절할 수 있다.
+
+---
+
+## 4. 토글 State 만들기
+
+이미지 설명을 보이거나 숨기기 위해 boolean 타입의 state를 사용할 수 있다.
+
+```jsx
+const [more, setMore] = useState(false); // false면 설명 숨김, true면 설명 표시
+
+function handleMoreClick() {
+  setMore(!more); // 현재 more 값의 반대로 변경
+}
+```
+
+`more`가 `true`이면 설명을 보여주고, `false`이면 설명을 숨길 수 있다.
+
+```jsx
+<button onClick={handleMoreClick}>
+  {more ? "Hide description" : "Show description"}
+</button>
+
+{more && <p>{slide.description}</p>}
+```
+
+삼항 연산자를 사용하여 버튼 문구를 상태에 따라 다르게 출력할 수 있고, `&&` 연산자를 사용하여 특정 조건일 때만 설명을 출력할 수 있다.
+
+---
+
+## 5. Carousel 컴포넌트 예시
+
+```jsx
+import { useState } from "react";
+import { galleryImages } from "./imgData.jsx";
+import styles from "./Carousel.module.css";
+
+export default function Carousel() {
+  const [index, setIndex] = useState(0); // 현재 이미지 index
+  const [more, setMore] = useState(false); // 설명 표시 여부
+
+  function handleNext() {
+    if (index === galleryImages.length - 1) {
+      setIndex(0); // 마지막 이미지면 처음으로 이동
+    } else {
+      setIndex(index + 1); // 다음 이미지로 이동
+    }
+  }
+
+  function handlePrevious() {
+    if (index === 0) {
+      setIndex(galleryImages.length - 1); // 첫 이미지면 마지막으로 이동
+    } else {
+      setIndex(index - 1); // 이전 이미지로 이동
+    }
+  }
+
+  function handleMoreClick() {
+    setMore(!more); // 설명 표시 상태 전환
+  }
+
+  let slide = galleryImages[index]; // 현재 index의 이미지 선택
+
+  return (
+    <section className={styles.wrapper}>
+      <h2>
+        <i>{slide.name}</i>
+        <br />
+        by {slide.artist}
+      </h2>
+
+      <h3>
+        ({index + 1} of {galleryImages.length})
+      </h3>
+
+      <img src={slide.url} alt={slide.alt} />
+
+      <div>
+        <button className={styles.button} onClick={handlePrevious}>
+          Previous
+        </button>
+
+        <button className={styles.button} onClick={handleNext}>
+          Next
+        </button>
+      </div>
+
+      <button className={styles.button} onClick={handleMoreClick}>
+        {more ? "Hide description" : "Show description"}
+      </button>
+
+      {more && <p>{slide.description}</p>}
+    </section>
+  );
+}
+```
+
+---
+
+## 6. 렌더링 과정의 3단계
+
+React는 컴포넌트가 화면에 표시되기 전에 렌더링 과정을 거친다.
+
+React의 렌더링 과정은 크게 3단계로 나눌 수 있다.
+
+1. 렌더링 트리거
+2. 컴포넌트 렌더링
+3. DOM에 커밋
+
+---
+
+## 7. 1단계: 렌더링 트리거
+
+렌더링이 시작되는 이유는 크게 두 가지이다.
+
+1. 컴포넌트의 초기 렌더링
+2. 컴포넌트의 state 업데이트
+
+초기 렌더링은 앱이 처음 실행될 때 발생한다.
+
+```jsx
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App.jsx";
+
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+```
+
+`createRoot(...).render(...)`가 호출되면 React는 App 컴포넌트를 화면에 렌더링하기 시작한다.
+
+State가 업데이트되는 경우에도 렌더링이 다시 발생한다.
+
+```jsx
+setIndex(index + 1); // state 업데이트로 렌더링 트리거
+```
+
+State를 변경하면 React는 해당 컴포넌트를 다시 렌더링해야 한다고 판단한다.
+
+---
+
+## 8. 렌더링 큐
+
+State가 업데이트되면 React는 렌더링 요청을 렌더링 큐에 추가한다.
+
+렌더링 큐는 먼저 요청된 작업부터 순서대로 처리하는 자료구조이다.
+
+즉, React는 state 업데이트 요청을 받은 뒤 즉시 DOM을 바꾸는 것이 아니라, 필요한 렌더링 작업을 순서대로 처리한다.
+
+---
+
+## 9. 2단계: 컴포넌트 렌더링
+
+렌더링 단계에서 React는 컴포넌트를 호출하여 화면에 무엇을 표시해야 하는지 계산한다.
+
+이때 컴포넌트 함수가 실행되고 JSX가 반환된다.
+
+```jsx
+function App() {
+  return (
+    <h1>Hello React</h1>
+  );
+}
+```
+
+이 단계에서는 실제 DOM을 바로 수정하는 것이 아니라, 어떤 UI가 필요한지 계산하는 과정이라고 볼 수 있다.
+
+---
+
+## 10. 3단계: DOM에 커밋
+
+렌더링이 끝나면 React는 계산된 결과를 실제 DOM에 반영한다.
+
+초기 렌더링에서는 생성된 DOM 노드를 화면에 추가한다.
+
+리렌더링에서는 이전 결과와 비교하여 변경이 필요한 최소한의 부분만 DOM에 반영한다.
+
+```jsx
+root.render(<App />); // 렌더링 결과를 DOM에 반영
+```
+
+이 과정을 커밋이라고 한다.
+
+---
+
+## 11. 스냅샷처럼 동작하는 State
+
+State 변수는 일반 JavaScript 변수처럼 바로 변경되는 값이 아니다.
+
+State는 특정 렌더링 시점의 값을 기억하는 스냅샷처럼 동작한다.
+
+```jsx
+function handleClick() {
+  setIndex(index + 1); // 다음 렌더링에 사용할 state 변경 요청
+  console.log(index); // 현재 렌더링 시점의 index 값 출력
+}
+```
+
+`setIndex`를 호출해도 현재 코드 안의 `index` 값이 즉시 바뀌는 것은 아니다.
+
+React는 업데이트된 state 값을 바탕으로 다음 렌더링을 진행하고, 그 렌더링에서 새로운 state 값을 사용한다.
+
+---
+
+## 12. State 업데이트 흐름
+
+상호작용이 발생하면 React는 다음 순서로 동작한다.
+
+1. React에 state 업데이트를 요청한다.
+2. React가 state 값을 업데이트한다.
+3. React는 업데이트된 state 값의 스냅샷을 컴포넌트에 전달한다.
+4. 컴포넌트는 새로운 props와 이벤트 핸들러가 포함된 UI 스냅샷을 반환한다.
+5. React는 변경된 내용을 DOM에 커밋한다.
+
+```jsx
+function handleNext() {
+  setIndex(index + 1); // React에 state 업데이트 요청
+}
+```
+
+State는 컴포넌트 내부에 직접 존재하는 일반 변수가 아니라 React 내부에서 관리되는 값이다.
+
+---
+
+## 핵심 정리
+
+- `useState`는 컴포넌트의 상태를 기억하기 위한 Hook이다.
+- Hook은 컴포넌트 최상위에서만 호출해야 한다.
+- 하나의 컴포넌트 안에서 여러 개의 state를 사용할 수 있다.
+- 관련 없는 state는 나누어 관리하는 것이 좋다.
+- boolean state를 사용하면 보이기/숨기기 같은 토글 기능을 구현할 수 있다.
+- React의 렌더링 과정은 렌더링 트리거 → 컴포넌트 렌더링 → DOM 커밋 순서로 진행된다.
+- State 업데이트는 렌더링을 다시 발생시키는 트리거가 된다.
+- State는 일반 변수처럼 바로 바뀌는 것이 아니라 특정 렌더링 시점의 스냅샷처럼 동작한다.
+- `setState`를 호출하면 React가 다음 렌더링에서 변경된 state 값을 반영한다.
+
+---
+
+## 한줄 정리
+
+12주차에는 `useState` Hook의 사용 규칙과 여러 개의 state 관리 방법, 그리고 React가 state 변경 후 렌더링하고 DOM에 커밋하는 전체 흐름을 학습하였다.
+
+---
+
 ## 📅 11주차
 # 11주차 학습 기록: State Hook과 이미지 캐러셀 구현
 
