@@ -1,5 +1,254 @@
 <h1 align="center">202130402 김민수</h1>
 ---
+## 📅 13주차
+# 13주차 학습 기록: State 업데이트 배치처리와 React 프로젝트 배포
+
+---
+
+## 1. React State 업데이트의 배치처리
+
+React에서 `set` 함수로 state 값을 변경하면 새로운 렌더링 요청이 렌더링 큐에 들어간다.
+
+하지만 경우에 따라 React는 state 업데이트를 바로 처리하지 않고, 여러 업데이트를 모아서 한 번에 처리한다.
+
+이것을 **배치처리(batch processing)** 라고 한다.
+
+```jsx
+function handleIncrease() {
+  setNumber(number + 1); // number는 현재 렌더링 시점의 값
+  setNumber(number + 1);
+  setNumber(number + 1);
+}
+```
+
+위 코드에서 `setNumber(number + 1)`을 여러 번 호출하더라도 `number` 값은 현재 렌더링 시점의 값으로 고정되어 있다.
+
+따라서 `number`가 0이었다면 세 번 호출해도 결과는 3이 아니라 1이 될 수 있다.
+
+---
+
+## 2. State는 렌더링 시점의 스냅샷
+
+React의 state는 일반 변수처럼 즉시 바뀌는 값이 아니라, 특정 렌더링 시점의 값을 기억하는 스냅샷처럼 동작한다.
+
+```jsx
+const [number, setNumber] = useState(0);
+
+function handleIncrease() {
+  setNumber(number + 1);
+  console.log(number); // 현재 렌더링 시점의 number 값 출력
+}
+```
+
+`setNumber`를 호출해도 현재 함수 안의 `number` 값이 바로 바뀌는 것은 아니다.
+
+React는 업데이트 요청을 받은 뒤 다음 렌더링에서 변경된 state 값을 반영한다.
+
+---
+
+## 3. 업데이터 함수 사용
+
+이전 state 값을 기준으로 여러 번 업데이트해야 할 때는 업데이터 함수를 사용한다.
+
+```jsx
+setNumber((n) => n + 1); // 이전 state 값을 기준으로 업데이트
+```
+
+여기서 `n`은 현재 state의 이전 값을 의미한다.
+
+업데이터 함수를 사용하면 React는 큐에 저장된 업데이트를 순서대로 처리한다.
+
+```jsx
+function handleIncrease() {
+  setNumber((n) => n + 1);
+  setNumber((n) => n + 1);
+  setNumber((n) => n + 1);
+}
+```
+
+위 코드에서는 업데이트 함수가 순서대로 처리되기 때문에 `number` 값이 0이었다면 최종 결과는 3이 된다.
+
+---
+
+## 4. 업데이터 함수 처리 흐름
+
+업데이터 함수를 `set` 함수에 전달하면 React는 다음과 같이 동작한다.
+
+1. 이벤트 핸들러의 나머지 코드가 모두 실행된 뒤 업데이트 함수를 큐에 넣는다.
+2. React는 큐를 순회하면서 업데이트를 순서대로 처리한다.
+3. 최종적으로 계산된 state 값이 다음 렌더링에 사용된다.
+
+```jsx
+setNumber((n) => n + 1);
+setNumber((n) => n + 1);
+setNumber((n) => n + 1);
+```
+
+처리 흐름은 다음과 같이 이해할 수 있다.
+
+| 업데이트 | n | return |
+|---|---:|---:|
+| `n => n + 1` | 0 | 1 |
+| `n => n + 1` | 1 | 2 |
+| `n => n + 1` | 2 | 3 |
+
+따라서 최종 state 값은 3이 된다.
+
+---
+
+## 5. number 대신 n을 사용하는 이유
+
+업데이터 함수 안에서 `number` 대신 `n`을 사용하는 이유는 역할을 구분하기 위해서이다.
+
+`number`는 렌더링 후 최종적으로 결정된 state 값을 의미하고, `n`은 업데이터 함수 내부에서 순서대로 계산되는 이전 state 값을 의미한다.
+
+```jsx
+setNumber((n) => n + 1); // n은 이전 state 값
+```
+
+물론 `n` 대신 다른 이름을 사용할 수도 있다.
+
+하지만 React에서는 보통 state 변수명의 첫 글자를 사용하여 업데이터 함수의 매개변수 이름을 정한다.
+
+예를 들어 state 이름이 `number`이면 `n`, state 이름이 `count`이면 `c`처럼 사용할 수 있다.
+
+---
+
+## 6. State 교체와 업데이트 함수 비교
+
+State를 직접 새 값으로 교체하는 방식과 업데이터 함수를 사용하는 방식은 동작이 다르다.
+
+```jsx
+function handleIncrease5() {
+  setNumber(number + 5); // 현재 number 기준으로 5 증가
+  console.log(number);
+  setNumber((n) => n + 1); // 이전 업데이트 결과를 기준으로 1 증가
+  console.log(number);
+}
+```
+
+또 다른 예시는 다음과 같다.
+
+```jsx
+function handleIncrease10() {
+  setNumber(number + 4); // 현재 number 기준으로 4 증가
+  console.log(number);
+  setNumber((n) => n + 1); // 앞선 업데이트 결과 기준으로 1 증가
+  console.log(number);
+  setNumber(10); // 최종 state를 10으로 교체
+  console.log(number);
+}
+```
+
+업데이터 함수는 이전 업데이트 결과를 이어받아 계산하지만, `setNumber(10)`처럼 값을 직접 전달하면 state를 해당 값으로 교체한다.
+
+---
+
+## 7. React 프로젝트 배포 준비
+
+React 프로젝트를 GitHub Pages로 배포하기 위해서는 먼저 `gh-pages` 라이브러리를 설치한다.
+
+```bash
+npm i gh-pages
+```
+
+그 다음 `package.json` 파일에 `homepage`를 추가한다.
+
+```json
+{
+  "homepage": "https://사용자이름.github.io/저장소이름",
+  "name": "project-name",
+  "version": "0.1.0"
+}
+```
+
+`homepage`는 GitHub Pages에서 배포될 주소를 의미한다.
+
+---
+
+## 8. package.json scripts 설정
+
+배포를 위해 `package.json`의 `scripts`에 `predeploy`와 `deploy` 명령어를 추가한다.
+
+```json
+{
+  "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+  }
+}
+```
+
+`predeploy`는 배포 전에 프로젝트를 빌드하는 명령어이다.
+
+`deploy`는 빌드된 결과물을 `gh-pages` 브랜치에 올리는 명령어이다.
+
+Vite 프로젝트에서는 빌드 폴더명이 보통 `dist`이므로, 상황에 따라 다음처럼 작성할 수 있다.
+
+```json
+{
+  "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  }
+}
+```
+
+---
+
+## 9. 프로젝트 배포 실행
+
+설정이 끝나면 터미널에서 다음 명령어를 실행한다.
+
+```bash
+npm run deploy
+```
+
+배포가 성공하면 GitHub 저장소에 `gh-pages` 브랜치가 생성된다.
+
+이후 GitHub 저장소에서 `Settings` → `Pages` 메뉴로 이동한다.
+
+배포 source를 `Deploy from a branch`로 설정하고, branch를 `gh-pages`로 선택한 뒤 저장한다.
+
+---
+
+## 10. GitHub Pages 확인
+
+GitHub Pages 설정이 완료되면 잠시 후 사이트 주소가 생성된다.
+
+```text
+https://사용자이름.github.io/저장소이름
+```
+
+개인 페이지 저장소처럼 저장소 이름이 `사용자이름.github.io`인 경우에는 다음 주소로 접속할 수 있다.
+
+```text
+https://사용자이름.github.io/
+```
+
+배포 후에는 사이트에 접속하여 수정한 내용이 정상적으로 반영되었는지 확인한다.
+
+---
+
+## 핵심 정리
+
+- React는 여러 state 업데이트를 모아서 배치처리할 수 있다.
+- 같은 렌더링 안에서 state 값은 스냅샷처럼 고정된다.
+- 이전 state 값을 기준으로 업데이트할 때는 업데이터 함수를 사용한다.
+- `setNumber((n) => n + 1)`에서 `n`은 이전 state 값을 의미한다.
+- 업데이터 함수는 큐에 저장된 뒤 순서대로 처리된다.
+- 값을 직접 전달하는 `setNumber(10)`은 state를 해당 값으로 교체한다.
+- React 프로젝트는 `gh-pages`를 이용해 GitHub Pages에 배포할 수 있다.
+- 배포 전 `homepage`, `predeploy`, `deploy` 설정이 필요하다.
+- 배포 후 GitHub Pages에서 `gh-pages` 브랜치를 선택하여 사이트를 공개한다.
+
+---
+
+## 한줄 정리
+
+13주차에는 React state 업데이트가 배치처리되는 방식과 업데이터 함수의 동작 원리를 학습하고, React 프로젝트를 GitHub Pages에 배포하는 방법을 실습하였다.
+
+---
 
 ## 📅 12주차
 # 12주차 학습 기록: State Hook의 동작 원리와 렌더링 과정
